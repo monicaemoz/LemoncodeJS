@@ -1,0 +1,17 @@
+{
+  "name": "01-basic",
+  "version": "1.0.0",
+  "description": "Let's start with a very basic sample, just add an html plus a simple console log (E5). This is what you can find in the getting started tutorial.",
+  "scripts": {
+    "build": "rimraf dist && parcel ./index.html",
+    "build:prod": "rimraf dist && parcel build ./index.html",
+    "start": "rimraf dist && parcel ./index.html --open"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "parcel": "^2.8.3",
+    "rimraf": "^4.1.2"
+  }
+}
