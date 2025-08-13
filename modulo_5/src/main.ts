@@ -30,122 +30,128 @@ const cartas: Cartas[] = [
   { valor: 0.5, texto: "12", img: "src/resources/12_rey-copas.jpg" },
 ];
 
-// Función para obtener una carta aleatoria
-function dameCarta(): Cartas {
-  const carta = cartas[Math.floor(Math.random() * cartas.length)];
+const obtenerNumeroAleatorio = () => {
+  return Math.floor(Math.random() * cartas.length);
+};
+
+// Función para obtener una carta aleatoria *
+function dameCarta(numeroAleatorio: number): Cartas {
+  const carta = cartas[numeroAleatorio];
   return carta;
 }
 
 // Función para mostrar la carta
-function mostrarCarta(carta: Cartas) {
+function mostrarCarta(texto: string, img: string) {
   const elementovalorCarta = document.getElementById("valorCarta");
   if (elementovalorCarta) {
-    elementovalorCarta.innerText = carta.texto;
+    elementovalorCarta.innerText = texto;
   }
 
   const cartaImg = document.getElementById("cartaImg");
   if (cartaImg instanceof HTMLImageElement) {
-    cartaImg.src = carta.img;
+    cartaImg.src = img;
   }
 }
 
 // Función para sumar la puntuación (Incluir en cada vez q se pida una carta)
 function sumarPuntuacion(carta: Cartas) {
-  puntuacion += carta.valor;
-  muestraPuntuacion();
+  return (puntuacion += carta.valor);
 }
+
+//*
+const actualizarPuntuación = (nuevosPuntos: number) => {
+  puntuacion = nuevosPuntos;
+};
 
 // Función para manejar el evento de pedir carta
 function pedirCarta() {
-  const carta = dameCarta();
-  mostrarCarta(carta);
-  sumarPuntuacion(carta);
-  verificarGameOver();
+  const numeroAleatorio = obtenerNumeroAleatorio();
+  const carta = dameCarta(numeroAleatorio);
+  mostrarCarta(carta.texto, carta.img);
+  const nuevosPuntos = sumarPuntuacion(carta);
+  actualizarPuntuación(nuevosPuntos);
+  muestraPuntuacion();
+  verificarPartida();
 }
 
 //Evento para el botón de pedir carta
 const botonPedirCarta = document.getElementById("pedirCartaBtn");
-botonPedirCarta?.addEventListener("click", pedirCarta);
+
+if (botonPedirCarta && botonPedirCarta instanceof HTMLButtonElement) {
+  botonPedirCarta.addEventListener("click", pedirCarta);
+}
+
+//Mostrar mensaje*
+const mostrarMensaje = (mensaje: string) => {
+  const elementoMensaje = document.getElementById("mensaje");
+  if (elementoMensaje) {
+    elementoMensaje.innerText = mensaje;
+  }
+};
 
 // Función para verificar si se termina el juego
-function verificarGameOver() {
+function verificarPartida() {
   if (puntuacion > 7.5) {
-    const elementoMensaje = document.getElementById("mensaje");
-    if (elementoMensaje) {
-      elementoMensaje.innerText = "Has perdido, te has pasado de 7.5 puntos.";
-    }
-    bloquearJuego();
+    mostrarMensaje("Has perdido, te has pasado de 7.5 puntos.");
+    bloquearJuego(true);
   } else if (puntuacion == 7.5) {
-    const elementoMensaje = document.getElementById("mensaje");
-    if (elementoMensaje) {
-      elementoMensaje.innerText = "¡Lo has clavado!¡Enhorabuena!";
-    }
-    bloquearJuego();
+    mostrarMensaje("¡Lo has clavado!¡Enhorabuena!");
+    bloquearJuego(true);
   }
 }
 
 // Función para bloquear los botones cuando el juego termina
-function bloquearJuego() {
+function bloquearJuego(estaDeshabilitado: boolean) {
   const elementoPedirCarta = document.getElementById("pedirCartaBtn");
   if (elementoPedirCarta instanceof HTMLButtonElement) {
-    elementoPedirCarta.disabled = true;
+    elementoPedirCarta.disabled = estaDeshabilitado;
   }
   const elementoPlantarse = document.getElementById("plantarseBtn");
   if (elementoPlantarse instanceof HTMLButtonElement) {
-    elementoPlantarse.disabled = true;
+    elementoPlantarse.disabled = estaDeshabilitado;
   }
 }
 
-// Función para manejar el evento de plantarse
-function plantarse() {
-  let mensaje: string = "";
+//Obtener mensaje cuando te plantas
+const obtenerMensajeCuandoMePlanto = () => {
   if (puntuacion < 4) {
-    mensaje = `Te has quedado lejos con ${puntuacion} puntos.`;
+    return `Te has quedado lejos con ${puntuacion} puntos.`;
   } else if (puntuacion === 5) {
-    mensaje = `Tenías miedo, te quedaste en ${puntuacion} puntos.`;
+    return `Tenías miedo, te quedaste en ${puntuacion} puntos.`;
   } else if (puntuacion >= 6 && puntuacion < 7.5) {
-    mensaje = `Casi lo logras, conseguiste ${puntuacion} puntos.`;
+    return `Casi lo logras, conseguiste ${puntuacion} puntos.`;
   } else if (puntuacion === 7.5) {
-    mensaje = `¡Has ganado! Llegaste a ${puntuacion} puntos.`;
+    return `¡Has ganado! Llegaste a ${puntuacion} puntos.`;
   }
+  return `Error, nose porque estas aqui`;
+};
 
-  const elementoMensaje = document.getElementById("mensaje");
-  if (elementoMensaje && mensaje !== undefined) {
-    elementoMensaje.innerText = mensaje;
-  }
-  bloquearJuego(); //NUEVO CAMBIO COMRPOBAR
+// Función para manejar el evento de plantarse*
+function plantarse() {
+  const mensaje: string = obtenerMensajeCuandoMePlanto();
+  mostrarMensaje(mensaje);
+  bloquearJuego(true);
 }
 
 // Evento para el botón de plantarse
 const botonPlantarse = document.getElementById("plantarseBtn");
-botonPlantarse?.addEventListener("click", plantarse);
+
+if (botonPlantarse && botonPlantarse instanceof HTMLButtonElement) {
+  botonPlantarse.addEventListener("click", plantarse);
+}
 
 // Función para reiniciar el juego
 function reiniciarJuego() {
-  puntuacion = 0;
+  actualizarPuntuación(0);
   muestraPuntuacion();
-  const elementovalorCarta = document.getElementById("valorCarta");
-  if (elementovalorCarta) {
-    elementovalorCarta.innerText = "Boca abajo";
-  }
-  const elementoImgCarta = document.getElementById("cartaImg");
-  if (elementoImgCarta instanceof HTMLImageElement) {
-    elementoImgCarta.src = "src/resources/back.jpg";
-  }
-  const elementoMensaje = document.getElementById("mensaje");
-  if (elementoMensaje) {
-    elementoMensaje.innerText = "vamos a jugar!";
-  }
-  const elementoPedirCarta = document.getElementById("pedirCartaBtn");
-  if (elementoPedirCarta instanceof HTMLButtonElement) {
-    elementoPedirCarta.disabled = false;
-  }
-  const elementoPlantarse = document.getElementById("plantarseBtn");
-  if (elementoPlantarse instanceof HTMLButtonElement) {
-    elementoPlantarse.disabled = false;
-  }
+  mostrarCarta("Boca abajo", "src/resources/back.jpg");
+  mostrarMensaje("vamos a jugar!");
+  bloquearJuego(false);
 }
 
 // Evento para el botón de reinicio
 const botonReinicio = document.getElementById("reiniciarBtn");
-botonReinicio?.addEventListener("click", reiniciarJuego);
+
+if (botonReinicio && botonReinicio instanceof HTMLButtonElement) {
+  botonReinicio.addEventListener("click", reiniciarJuego);
+}

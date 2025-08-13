@@ -6,6 +6,11 @@ export const partida: Partida = {
   puntuacion: 0,
 };
 
+//*
+export const actualizarPuntuación = (nuevosPuntos: number) => {
+  partida.puntuacion = nuevosPuntos;
+};
+
 //Interfaz cartas
 export interface Cartas {
   valor: number;
